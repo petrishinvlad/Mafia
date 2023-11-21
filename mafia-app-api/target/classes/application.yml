@@ -1,0 +1,2 @@
+telegram-api:
+    url: ${TELEGRAM_URL:http://www.google.com}
