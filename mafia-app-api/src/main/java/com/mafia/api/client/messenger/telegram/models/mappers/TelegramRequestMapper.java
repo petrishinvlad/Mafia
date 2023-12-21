@@ -1,8 +1,11 @@
-package com.mafia.api.client.telegram.models.mappers;
+package com.mafia.api.client.messenger.telegram.models.mappers;
 
 import com.mafia.api.models.requests.MessengerPollRequest;
 import com.mafia.api.models.requests.NewGamePollRequest;
 
+import jakarta.inject.Named;
+
+@Named
 public class TelegramRequestMapper {
     public MessengerPollRequest fromNewGameRequestToPoll(final NewGamePollRequest newGamePollRequest) {
         String question = newGamePollRequest.getAddress();

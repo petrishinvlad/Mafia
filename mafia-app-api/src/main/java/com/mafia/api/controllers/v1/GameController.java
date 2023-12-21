@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mafia.api.client.telegram.TelegramClientProvider;
-import com.mafia.api.client.telegram.models.mappers.TelegramRequestMapper;
+import com.mafia.api.client.messenger.Messenger;
 import com.mafia.api.models.requests.NewGamePollRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -17,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/game")
 public class GameController {
-    private final TelegramClientProvider telegramClient;
-
-    private final TelegramRequestMapper telegramRequestMapper;
+    private final Messenger messenger;
 
     @GetMapping("/test")
     public ResponseEntity<?> testEndpoint() {
@@ -33,7 +30,8 @@ public class GameController {
                                                 .gameDay(null)
                                                 .options(null)
                                                 .build();
-        telegramClient.sendPoll(telegramRequestMapper.fromNewGameRequestToPoll(newGamePollRequest));
+        messenger.sendPoll(null);
+        // telegramClient.sendPoll(telegramRequestMapper.fromNewGameRequestToPoll(newGamePollRequest));
         return ResponseEntity.ok("qwead");
     }
 }
