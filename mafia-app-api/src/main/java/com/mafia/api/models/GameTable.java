@@ -14,27 +14,26 @@ import lombok.Data;
 
 @Data
 @Builder
-// @Entity
-// @Table(name = "GAME_TABLES")
+@Entity
+@Table(name = "GAME_TABLES")
 public class GameTable {
-    // @Id
-    // @GeneratedValue
-    // @Column(name = "ID")
+    @Id
+    @GeneratedValue
+    @Column(name = "ID")
     private int id;
 
-    // @Column(name = "BEST_MOVE")
-    // private String bestMove;
+    @Column(name = "BEST_MOVE")
+    private String bestMove;
 
     //TODO
     // private final Player judge;
 
-    // @Column(name = "PLAYER_COMMENTS")
-    // private String playerComments; 
+    @Column(name = "PLAYER_COMMENTS")
+    private String playerComments; 
 
-    // @Column(name = "JUDGE_COMMENTS")
-    // private String judgeComments;
+    @Column(name = "JUDGE_COMMENTS")
+    private String judgeComments;
 
-    // @Column(name = "GAME_TIME")
-    // private LocalDateTime gameTime;
-    
+    @Column(name = "GAME_TIME")
+    private LocalDateTime gameTime;
 }

@@ -10,17 +10,17 @@ import lombok.Data;
 
 @Data
 @Builder
-// @Entity
-// @Table(name = "MAFIA_CLUBS")
+@Entity
+@Table(name = "MAFIA_CLUBS")
 public class MafiaClub {
-    // @Id
-    // @GeneratedValue
-    // @Column(name = "ID")
+    @Id
+    @GeneratedValue
+    @Column(name = "ID")
     private int id;
 
-    // @Column(name = "NAME")
+    @Column(name = "NAME")
     private String name;
 
-    // @Column(name = "DESCRIPTION")
+    @Column(name = "DESCRIPTION")
     private String description;
 }
