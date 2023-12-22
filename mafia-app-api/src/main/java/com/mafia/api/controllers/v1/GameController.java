@@ -1,6 +1,8 @@
 package com.mafia.api.controllers.v1;
 
+import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mafia.api.client.messenger.Messenger;
 import com.mafia.api.models.requests.NewGamePollRequest;
+import com.mafia.api.repository.MafiaClubRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,9 +21,10 @@ import lombok.RequiredArgsConstructor;
 public class GameController {
     private final Messenger messenger;
 
+    // private final MafiaClubRepository clubRepository;
+
     @GetMapping("/test")
     public ResponseEntity<?> testEndpoint() {
-        System.out.println("Here");
         NewGamePollRequest newGamePollRequest = NewGamePollRequest.builder()
                                                 .chat_id(null)
                                                 .is_anonymous(false)
@@ -30,6 +34,7 @@ public class GameController {
                                                 .gameDay(null)
                                                 .options(null)
                                                 .build();
+        // System.out.println(jdbcTemplate.queryForList("SELECT * FROM Player"));
         messenger.sendPoll(null);
         // telegramClient.sendPoll(telegramRequestMapper.fromNewGameRequestToPoll(newGamePollRequest));
         return ResponseEntity.ok("qwead");

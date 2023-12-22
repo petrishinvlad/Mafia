@@ -8,9 +8,10 @@ import lombok.Data;
 @Data
 @Builder
 public class PlayerStats {
-    public List<PlayerSeasonStats> seasonStats;
+    private Player player;
+    private List<PlayerSeasonStats> seasonStats;
 
-    public PlayerOverallStats getOverallStats() {
+    private PlayerOverallStats getOverallStats() {
         return new PlayerOverallStats(seasonStats);
-    }
+    } 
 }
