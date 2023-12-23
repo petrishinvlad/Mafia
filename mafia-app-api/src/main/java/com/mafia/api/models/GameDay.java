@@ -5,17 +5,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
-// @Entity
-// @Table(name = "GAME_DAYS")
+@Entity
+@Table(name = "GAME_DAYS")
 public class GameDay {
-    // @Id
-    // @GeneratedValue
-    // @Column(name = "ID")
+    @Id
+    @GeneratedValue
+    @Column(name = "ID")
+    @Setter(AccessLevel.NONE)
     private int id;
 
     //TODO

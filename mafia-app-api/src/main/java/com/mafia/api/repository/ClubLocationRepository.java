@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.mafia.api.models.ClubLocation;
 
-public interface ClubLocationRepository extends JpaRepository<ClubLocation, Integer> {
+public interface ClubLocationRepository extends JpaRepository<ClubLocation, Long> {
     
 }

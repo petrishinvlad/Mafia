@@ -7,24 +7,28 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
-// @Entity
-// @Table(name = "GAME_SEASONS")
+@Entity
+@Table(name = "GAME_SEASONS")
 public class GameSeason {
-    // @Id
-    // @GeneratedValue
-    // @Column(name = "ID")
+    @Id
+    @GeneratedValue
+    @Column(name = "ID")
+    @Setter(AccessLevel.NONE)
     private int id;
 
-    // @Column(name = "START_TIME")
-    // private LocalDateTime startTime;
+    @Column(name = "START_TIME")
+    private LocalDateTime startTime;
 
-    // @Column(name = "END_TIME")
-    // private LocalDateTime endTime;
+    @Column(name = "END_TIME")
+    private LocalDateTime endTime;
 
     // @Column(name = "LOCATION")
     // private ClubLocation location;

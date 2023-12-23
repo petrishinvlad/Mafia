@@ -1,6 +1,7 @@
 package com.mafia.api.controllers.v1;
 
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import java.util.ArrayList;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -9,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mafia.api.client.messenger.Messenger;
+import com.mafia.api.models.ClubLocation;
 import com.mafia.api.models.requests.NewGamePollRequest;
+import com.mafia.api.repository.ClubLocationRepository;
+import com.mafia.api.repository.GameRepository;
 import com.mafia.api.repository.MafiaClubRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +25,11 @@ import lombok.RequiredArgsConstructor;
 public class GameController {
     private final Messenger messenger;
 
-    // private final MafiaClubRepository clubRepository;
+    private final JdbcTemplate jdbcTemplate;
+
+    private final MafiaClubRepository mafiaClubRepository;
+    private final GameRepository gameRepository;
+    private final ClubLocationRepository clubLocationRepository;
 
     @GetMapping("/test")
     public ResponseEntity<?> testEndpoint() {

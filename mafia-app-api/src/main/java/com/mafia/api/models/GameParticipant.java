@@ -5,22 +5,26 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
-// @Entity
-// @Table(name = "GAME_PARTICIPANTS")
+@Entity
+@Table(name = "GAME_PARTICIPANTS")
 public class GameParticipant {
-    // @Id
-    // @GeneratedValue
-    // @Column(name = "ID")
+    @Id
+    @GeneratedValue
+    @Column(name = "ID")
+    @Setter(AccessLevel.NONE)
     private int id;
 
     //TODO
     // private PlayerRole role;
 
-    // @Column(name = "points")
-    // private double points;
+    @Column(name = "points")
+    private double points;
 }
