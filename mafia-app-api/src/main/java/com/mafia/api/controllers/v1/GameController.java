@@ -11,19 +11,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mafia.api.client.messenger.Messenger;
 import com.mafia.api.models.ClubLocation;
+import com.mafia.api.models.GameTable;
 import com.mafia.api.models.requests.NewGamePollRequest;
+import com.mafia.api.models.requests.NewGameRequest;
 import com.mafia.api.repository.ClubLocationRepository;
 import com.mafia.api.repository.GameRepository;
 import com.mafia.api.repository.MafiaClubRepository;
+import com.mafia.api.service.GameService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/v1/game")
+@RequestMapping("/api/v1")
 public class GameController {
     private final Messenger messenger;
+
+    private final GameService gameService;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -31,7 +39,7 @@ public class GameController {
     private final GameRepository gameRepository;
     private final ClubLocationRepository clubLocationRepository;
 
-    @GetMapping("/test")
+    @GetMapping("/game/test")
     public ResponseEntity<?> testEndpoint() {
         NewGamePollRequest newGamePollRequest = NewGamePollRequest.builder()
                                                 .chat_id(null)
@@ -42,9 +50,13 @@ public class GameController {
                                                 .gameDay(null)
                                                 .options(null)
                                                 .build();
-        // System.out.println(jdbcTemplate.queryForList("SELECT * FROM Player"));
         messenger.sendPoll(null);
         // telegramClient.sendPoll(telegramRequestMapper.fromNewGameRequestToPoll(newGamePollRequest));
         return ResponseEntity.ok("qwead");
+    }
+
+    @PostMapping("/game")
+    public ResponseEntity<GameTable> createGame(@RequestBody NewGameRequest newGameRequest) {
+        return ResponseEntity.ok().body(gameService.createNewGame(newGameRequest));
     }
 }

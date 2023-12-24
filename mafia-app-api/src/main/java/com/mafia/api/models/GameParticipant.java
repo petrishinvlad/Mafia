@@ -1,9 +1,15 @@
 package com.mafia.api.models;
 
+import java.util.Map.Entry;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,9 +28,17 @@ public class GameParticipant {
     @Setter(AccessLevel.NONE)
     private int id;
 
-    //TODO
-    // private PlayerRole role;
+    // @Column(name = "playerId")
+    // private String playerId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private PlayerRole role;
 
     @Column(name = "points")
     private double points;
+
+    @ManyToOne
+    @JoinColumn(name = "gameTableId")
+    private GameTable gameTable;
 }

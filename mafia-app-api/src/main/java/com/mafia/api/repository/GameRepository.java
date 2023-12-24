@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.mafia.api.models.GameTable;
 
-public interface GameRepository extends JpaRepository<GameTable, Long> {
+public interface GameRepository extends JpaRepository<GameTable, Integer> {
     
 }
