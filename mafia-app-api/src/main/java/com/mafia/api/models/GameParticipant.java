@@ -2,10 +2,13 @@ package com.mafia.api.models;
 
 import java.util.Map.Entry;
 
+import com.mafia.api.models.player.Player;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -28,8 +31,12 @@ public class GameParticipant {
     @Setter(AccessLevel.NONE)
     private int id;
 
-    // @Column(name = "playerId")
-    // private String playerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playerId")
+    private Player player;
+    
+    @Column(name = "position")
+    private Integer position;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
@@ -38,7 +45,7 @@ public class GameParticipant {
     @Column(name = "points")
     private double points;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gameTableId")
     private GameTable gameTable;
 }

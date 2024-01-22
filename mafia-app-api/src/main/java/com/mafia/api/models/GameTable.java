@@ -5,8 +5,10 @@ import java.util.Set;
 
 import com.mafia.api.models.player.Player;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -14,13 +16,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "GAME_TABLES")
 public class GameTable {
@@ -33,10 +39,9 @@ public class GameTable {
     @Column(name = "BEST_MOVE")
     private String bestMove;
 
-    //TODO
-    // @ManyToOne
-    // @JoinColumn(name = "judge")
-    // private final Player judge;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "judgeId")
+    private Player judge;
 
     @Column(name = "PLAYER_COMMENTS")
     private String playerComments; 
@@ -47,6 +52,9 @@ public class GameTable {
     @Column(name = "GAME_TIME")
     private LocalDateTime gameTime;
 
-    @OneToMany(mappedBy = "gameTable")
+    @OneToMany(
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL,
+        mappedBy = "gameTable")
     private Set<GameParticipant> gameParticipants;
 }

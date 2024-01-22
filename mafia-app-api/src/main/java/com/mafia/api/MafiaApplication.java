@@ -70,18 +70,27 @@ public class MafiaApplication implements CommandLineRunner {
 
 		gameRepository.save(gameTableFirst);
 
-		playerRepository.save(Player.builder()
+		Player firstPlayer = Player.builder()
 			.firstname("Vladyslav")
 			.lastname("Petryshyn")
 			.location("London")
 			.nickname("Adamant")
-			.build()
-		);
+			.build();
+
+		Player secondPlayer = Player.builder()
+			.firstname("Elina")
+			.lastname("Bartsevich")
+			.location("London")
+			.nickname("Ginger")
+			.build();
+
+		playerRepository.save(firstPlayer);
+		playerRepository.save(secondPlayer);
 
 		gameParticipantRepository.save(
 			GameParticipant.builder()
 			.gameTable(gameTableFirst)
-			.role(PlayerRole.SHERIFF)
+			.player(firstPlayer)
 			.build()
 		);
 

@@ -51,12 +51,12 @@ public class GameController {
                                                 .options(null)
                                                 .build();
         messenger.sendPoll(null);
-        // telegramClient.sendPoll(telegramRequestMapper.fromNewGameRequestToPoll(newGamePollRequest));
         return ResponseEntity.ok("qwead");
     }
 
     @PostMapping("/game")
     public ResponseEntity<GameTable> createGame(@RequestBody NewGameRequest newGameRequest) {
-        return ResponseEntity.ok().body(gameService.createNewGame(newGameRequest));
+        GameTable responseBody = gameService.createNewGame(newGameRequest);
+        return ResponseEntity.ok().body(responseBody);
     }
 }
