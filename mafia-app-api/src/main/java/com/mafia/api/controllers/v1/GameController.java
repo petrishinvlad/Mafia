@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mafia.api.client.messenger.Messenger;
+import com.mafia.api.client.polemica.PolemicaClient;
 import com.mafia.api.models.ClubLocation;
 import com.mafia.api.models.GameTable;
 import com.mafia.api.models.requests.NewGamePollRequest;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600, allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/v1")
 public class GameController {
@@ -39,19 +40,22 @@ public class GameController {
     private final GameRepository gameRepository;
     private final ClubLocationRepository clubLocationRepository;
 
+    private final PolemicaClient polemica;
+
     @GetMapping("/game/test")
     public ResponseEntity<?> testEndpoint() {
-        NewGamePollRequest newGamePollRequest = NewGamePollRequest.builder()
-                                                .chat_id(null)
-                                                .is_anonymous(false)
-                                                .address(null)
-                                                .gameDate(null)
-                                                .gameTime(null)
-                                                .gameDay(null)
-                                                .options(null)
-                                                .build();
-        messenger.sendPoll(null);
-        return ResponseEntity.ok("qwead");
+        // NewGamePollRequest newGamePollRequest = NewGamePollRequest.builder()
+        //                                         .chat_id(null)
+        //                                         .is_anonymous(false)
+        //                                         .address(null)
+        //                                         .gameDate(null)
+        //                                         .gameTime(null)
+        //                                         .gameDay(null)
+        //                                         .options(null)
+        //                                         .build();
+        // messenger.sendPoll(null);
+        var polemicaResponse = polemica.polemicaGameStats("221645");
+        return ResponseEntity.ok("qweads");
     }
 
     @PostMapping("/game")

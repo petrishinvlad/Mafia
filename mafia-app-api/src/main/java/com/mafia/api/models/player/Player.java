@@ -38,6 +38,10 @@ public class Player {
     @Column(name = "LOCATION")
     private String location;
 
+    @Column(name = "POLEMICAID")
+    private String polemicaPlayerId;
+
+
     //TODO
     // private List<MafiaClub> mafiaClubs;
 }
