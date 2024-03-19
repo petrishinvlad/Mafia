@@ -11,6 +11,9 @@ import com.mafia.api.client.messenger.telegram.TelegramClientProvider;
 import com.mafia.api.models.GameParticipant;
 import com.mafia.api.models.GameTable;
 import com.mafia.api.models.PlayerRole;
+import com.mafia.api.models.mappers.GameParticipantListMapper;
+import com.mafia.api.models.mappers.GameParticipantMapper;
+import com.mafia.api.models.mappers.GameTableMapper;
 import com.mafia.api.models.player.Player;
 import com.mafia.api.models.requests.GameBestMoveRequest;
 import com.mafia.api.models.requests.GameRequest;
@@ -31,59 +34,36 @@ public class GameService {
     private final GameParticipantRepository gameParticipantRepository;
     private final PlayerRepository playerRepository;
 
-    public List<NewGamePollRequest> getAllNearestGamePolls() {
-        return List.of();
-    }
-
-
-    public void createNewPoll(final NewGamePollRequest newGamePollRequest) {
-
-    }
+    private final GameTableMapper gameTableMapper;
+    private final GameParticipantListMapper gameParticipantListMapper;
 
     public GameTable createNewGame(final NewGameRequest newGameRequest) {
-        Player judge = playerRepository.findById(newGameRequest.getJudge()).get();
-        GameTable game = GameTable.builder()
-                        .gameTime(newGameRequest.getStartTime())
-                        .judge(judge)
-                        .build();
+        GameTable game = gameTableMapper.newGameRequestToGameTable(newGameRequest);
         gameRepository.save(game);
 
-        Map<Integer, PlayerRole> participantsWithRoles = newGameRequest.getParticipantsWithRoles();
-        Map<Integer, Player> players = playerRepository
-            .findAllById(participantsWithRoles.keySet())
-            .stream()
-            .collect(Collectors.toMap(Player::getId, Function.identity()));
-
-        List<GameParticipant> gameParticipants = (List<GameParticipant>) participantsWithRoles.keySet()
-            .stream().map(participantId -> {
-                return GameParticipant.builder()
-                        .player(players.get(participantId))
-                        .gameTable(game)
-                        .role(participantsWithRoles.get(participantId))
-                        .build();
-            }).collect(Collectors.toList());
+        List<GameParticipant> gameParticipants = gameParticipantListMapper.newGameRequestToGameParticipants(newGameRequest, game);
         gameParticipantRepository.saveAll(gameParticipants);
         
-        return gameRepository.findById(game.getId()).get();
+        return game;
     }
 
     public void setBestMove(final GameBestMoveRequest bestGameMoveRequest) {
-        validateSuspectedPlayers(bestGameMoveRequest.getSuspectedPlayers());
-        final GameTable gameTable = gameRepository.findById(bestGameMoveRequest.getGameId()).get();
-        Double bestMovePoints = getBestMovePoints(bestGameMoveRequest, gameTable);
-        for (GameParticipant gameParticipant: gameTable.getGameParticipants()) {
-            if (gameParticipant.getPosition() == bestGameMoveRequest.getPlayerPosition()) {
-                //Hibernate should make an automatic update
-                gameParticipant.setPoints(gameParticipant.getPoints() + bestMovePoints);
-            }
-        }
+        // validateSuspectedPlayers(bestGameMoveRequest.getSuspectedPlayers());
+        // final GameTable gameTable = gameRepository.findById(bestGameMoveRequest.getGameId()).get();
+        // Double bestMovePoints = getBestMovePoints(bestGameMoveRequest, gameTable);
+        // for (GameParticipant gameParticipant: gameTable.getGameParticipants()) {
+        //     if (gameParticipant.getPosition() == bestGameMoveRequest.getPlayerPosition()) {
+        //         //Hibernate should make an automatic update
+        //         gameParticipant.setPoints(gameParticipant.getPoints() + bestMovePoints);
+        //     }
+        // }
     }
 
     public GameTable finishGame(final GameRequest gameRequest) {
         GameTable gameTable = gameRepository.findById(gameRequest.getTableId()).get();
-        gameTable.setPlayerComments(gameRequest.getPlayerComments());
-        gameTable.setJudgeComments(gameRequest.getJudgeComments());
-        gameTable.setBestMove(null);
+        // gameTable.setPlayerComments(gameRequest.getPlayerComments());
+        // gameTable.setJudgeComments(gameRequest.getJudgeComments());
+        // gameTable.setBestMove(null);
         return gameTable;
     }
 
@@ -95,23 +75,23 @@ public class GameService {
 
     private Double getBestMovePoints(final GameBestMoveRequest bestGameMoveRequest, final GameTable gameTable) {
         Double result = 0.0;
-        Set<GameParticipant> gameParticipants = gameTable.getGameParticipants();
-        GameParticipant killedPlayer = gameParticipants
-            .stream()
-            .filter(gameParticipant -> 
-                gameParticipant.getPosition() == bestGameMoveRequest.getPlayerPosition()
-            )
-            .collect(Collectors.toList()).get(0);
-        if (killedPlayer.getRole() == PlayerRole.GODFATHER 
-            || killedPlayer.getRole() == PlayerRole.MAFIA) {
-            return 0.0;
-        }
-        for (GameParticipant gameParticipant: gameParticipants) {
-            if (bestGameMoveRequest.getSuspectedPlayers().contains(gameParticipant.getPosition())) {
-                result += gameParticipant.getRole() == PlayerRole.GODFATHER 
-                            || gameParticipant.getRole() == PlayerRole.MAFIA ? 0.2 : 0;
-            }
-        }
+        // Set<GameParticipant> gameParticipants = gameTable.getGameParticipants();
+        // GameParticipant killedPlayer = gameParticipants
+        //     .stream()
+        //     .filter(gameParticipant -> 
+        //         gameParticipant.getPosition() == bestGameMoveRequest.getPlayerPosition()
+        //     )
+        //     .collect(Collectors.toList()).get(0);
+        // if (killedPlayer.getRole() == PlayerRole.GODFATHER 
+        //     || killedPlayer.getRole() == PlayerRole.MAFIA) {
+        //     return 0.0;
+        // }
+        // for (GameParticipant gameParticipant: gameParticipants) {
+        //     if (bestGameMoveRequest.getSuspectedPlayers().contains(gameParticipant.getPosition())) {
+        //         result += gameParticipant.getRole() == PlayerRole.GODFATHER 
+        //                     || gameParticipant.getRole() == PlayerRole.MAFIA ? 0.2 : 0;
+        //     }
+        // }
         return result;
     }
 }

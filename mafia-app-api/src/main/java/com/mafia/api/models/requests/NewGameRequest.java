@@ -13,6 +13,7 @@ import lombok.Data;
 public class NewGameRequest {
     private String name;
     private int judge;
+    private boolean judgeInGame;
     private LocalDateTime startTime;
     private Map<Integer, PlayerRole> participantsWithRoles;
 }
