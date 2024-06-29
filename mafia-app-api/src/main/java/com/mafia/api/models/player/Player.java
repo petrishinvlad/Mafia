@@ -39,7 +39,7 @@ public class Player {
     private String location;
 
     @Column(name = "POLEMICAID")
-    private String polemicaPlayerId;
+    private String swipealPlayerId;
 
 
     //TODO

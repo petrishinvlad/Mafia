@@ -30,8 +30,6 @@ public class GameSeason {
     @Column(name = "END_TIME")
     private LocalDateTime endTime;
 
-    // @Column(name = "LOCATION")
-    // private ClubLocation location;
 
     //TODO
     // private MafiaClub club;

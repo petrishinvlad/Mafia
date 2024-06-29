@@ -48,4 +48,7 @@ public class GameParticipant {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gameTableId")
     private GameTable gameTable;
+
+    @Column(name = "comments")
+    private String comments;
 }

@@ -34,4 +34,7 @@ public class ClubLocation {
     
     @Column(name = "ADDRESS")
     private String address;
+
+    @Column(name = "name")
+    private String name;
 }
