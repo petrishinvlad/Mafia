@@ -1,17 +1,16 @@
-package com.mafia.api.models.player;
+package com.mafia.api.bots.models;
 
+import java.util.HashSet;
 import java.util.Set;
-
-import com.mafia.api.models.MafiaClub;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -26,13 +25,19 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "PLAYERS")
-public class Player {
+@Table(name = "MAFIA_BOT_USER")
+public class MafiaBotUser {
     @Id
     @GeneratedValue
     @Column(name = "ID")
     @Setter(AccessLevel.NONE)
     private int id;
+
+    @OneToMany(
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL,
+        mappedBy = "user")
+    private Set<MafiaBotUserRole> mafiaBotUserRoles;
 
     @Column(name = "NICKNAME")
     private String nickname;
@@ -48,4 +53,12 @@ public class Player {
 
     @Column(name = "SWIPEAL_ID")
     private String swipealPlayerId;
+
+    @OneToMany(
+        fetch = FetchType.EAGER,
+        cascade = CascadeType.ALL,
+        mappedBy = "player")
+    private Set<MafiaBotPlayer> mafiaPlayers = new HashSet<>();
 }
+
+

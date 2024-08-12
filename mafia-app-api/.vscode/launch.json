@@ -2,16 +2,6 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Mafia-API<mafia-api>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.mafia.api.MafiaApplication",
-            "projectName": "mafia-api",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
-            "type": "java",
             "name": "Spring Boot-MafiaApplication<mafia-app-api>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
