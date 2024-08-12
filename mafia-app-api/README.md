@@ -1,4 +1,4 @@
-::: mermaid
+``` mermaid
 --- 
 title: Mafia Bot model 
 ---
@@ -66,4 +66,4 @@ MafiaBotPlayer --> MafiaBotGameRole : Uses
 MafiaBotGame --> MafiaBotGameStatus : Uses
 MafiaBotUser --* MafiaBotUserRole : Contains
 MafiaBotUser --* "0..*"  MafiaBotPlayer: Contains
-:::
+```
