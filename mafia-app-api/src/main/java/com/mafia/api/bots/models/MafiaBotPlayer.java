@@ -38,7 +38,7 @@ public class MafiaBotPlayer {
     @GeneratedValue
     @Column(name = "ID")
     @Setter(AccessLevel.NONE)
-    private int id;
+    private long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="PLAYER_ID")

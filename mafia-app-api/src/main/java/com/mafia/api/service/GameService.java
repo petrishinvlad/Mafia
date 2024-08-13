@@ -34,17 +34,18 @@ public class GameService {
     private final GameParticipantRepository gameParticipantRepository;
     private final PlayerRepository playerRepository;
 
-    private final GameTableMapper gameTableMapper;
+    // private final GameTableMapper gameTableMapper;
     private final GameParticipantListMapper gameParticipantListMapper;
 
     public GameTable createNewGame(final NewGameRequest newGameRequest) {
-        GameTable game = gameTableMapper.newGameRequestToGameTable(newGameRequest);
-        gameRepository.save(game);
+        // GameTable game = gameTableMapper.newGameRequestToGameTable(newGameRequest);
+        // gameRepository.save(game);
 
-        List<GameParticipant> gameParticipants = gameParticipantListMapper.newGameRequestToGameParticipants(newGameRequest, game);
-        gameParticipantRepository.saveAll(gameParticipants);
+        // List<GameParticipant> gameParticipants = gameParticipantListMapper.newGameRequestToGameParticipants(newGameRequest, game);
+        // gameParticipantRepository.saveAll(gameParticipants);
         
-        return game;
+        // return game;
+        return new GameTable();
     }
 
     public void setBestMove(final GameBestMoveRequest bestGameMoveRequest) {

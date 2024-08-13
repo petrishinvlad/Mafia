@@ -31,7 +31,7 @@ public class MafiaBotUser {
     @GeneratedValue
     @Column(name = "ID")
     @Setter(AccessLevel.NONE)
-    private int id;
+    private long id;
 
     @OneToMany(
         fetch = FetchType.LAZY,
