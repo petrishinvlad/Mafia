@@ -39,6 +39,9 @@ public class MafiaBotUser {
         mappedBy = "user")
     private Set<MafiaBotUserRole> mafiaBotUserRoles;
 
+    @Column(name = "TELEGRAM_NICKNAME")
+    private String telegramNickname;
+
     @Column(name = "NICKNAME")
     private String nickname;
 
@@ -50,6 +53,9 @@ public class MafiaBotUser {
 
     @Column(name = "LOCATION")
     private String location;
+
+    @Column(name = "ACTIVE")
+    private boolean active;
 
     @Column(name = "SWIPEAL_ID")
     private String swipealPlayerId;

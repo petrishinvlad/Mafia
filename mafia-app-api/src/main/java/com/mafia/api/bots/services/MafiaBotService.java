@@ -20,6 +20,7 @@ import com.mafia.api.bots.models.MafiaBotPlayer;
 import com.mafia.api.bots.models.MafiaBotUser;
 import com.mafia.api.bots.repository.MafiaBotGameRepository;
 import com.mafia.api.bots.repository.MafiaBotPlayerRepository;
+import com.mafia.api.bots.repository.MafiaBotUserRepository;
 import com.mafia.api.bots.utils.MafiaBotUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -32,11 +33,13 @@ public class MafiaBotService {
     protected static final String ADD_PLAYER_FAILED_PLAYER_REGISTERED_AS_JUDGE = "Player cannot be added, as he(she) is already game judge";
     protected static final String ADD_PLAYER_FAILED_TABLE_IS_FULL = "Player cannot be added, as the table is already full";
     protected static final String ADD_PLAYER_FAILED_WRONG_GAME_STATUS_PLACEHOLDER = "Player cannot be added, as game is in wrong status - ";
+    protected static final String ADD_PLAYER_FAILED_CORRECT_USER_NOT_FOUND = "Player cannot be added, as correct user is not found";
 
     protected static final int FULL_TABLE_PLAYERS_COUNT = 10; 
 
     private final MafiaBotGameRepository mafiaBotGameRepository;
     private final MafiaBotPlayerRepository mafiaBotPlayerRepository;
+    private final MafiaBotUserRepository mafiaBotUserRepository;
     //-----------------------------OLD NOT GOLD----------------------------
     private static final int PLAYERS_COUNT = 10;
 
@@ -85,7 +88,7 @@ public class MafiaBotService {
         MafiaBotGame gameToFinish = mafiaBotGameRepository.findById(gameId).get();
         validateGameBeforeFinishingGame(gameToFinish);
         gameToFinish.setGameStatus(MafiaBotGameStatus.GAME_FINISHED);
-        mafiaBotGameRepository.save(gameToFinish);
+        mafiaBotGameRepository.saveAndFlush(gameToFinish);
     }
 
     private void validateGameBeforeFinishingGame(MafiaBotGame gameToFinish) throws MafiaBotGameFinishException {
@@ -102,8 +105,14 @@ public class MafiaBotService {
         }
     }
 
-    public void addPlayer(MafiaBotGame game, MafiaBotUser user) throws MafiaBotAddPlayerException {
+    public void addPlayer(Long gameId, String telegramNickname) throws MafiaBotAddPlayerException {
+        MafiaBotGame game = mafiaBotGameRepository.findById(gameId).get();
         Set<MafiaBotPlayer> registeredPlayers = game.getPlayers();
+        List<MafiaBotUser> users = mafiaBotUserRepository.findByTelegramNickname(telegramNickname);
+        if (users.size() != 1) {
+            throw new MafiaBotAddPlayerException(ADD_PLAYER_FAILED_CORRECT_USER_NOT_FOUND);
+        }
+        MafiaBotUser user = users.get(0);
         MafiaBotUser judge = game.getMafiaJudge();
         validateAddingPlayer(game.getGameStatus(), registeredPlayers, judge);
 

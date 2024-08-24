@@ -5,6 +5,8 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -79,32 +81,29 @@ public class MafiaBotServiceIntegrationTest {
         mafiaBotService.announceGame(TEST_DATE_TIME);
         
         assertEquals("Wrong number of new games in repository",
-            mafiaBotGameRepository.findAll().size(), 1);
+            1, mafiaBotGameRepository.count());
+        MafiaBotGame announcedGame = mafiaBotGameRepository.findAll().get(0);
         assertEquals("New game contains wrong status",
             MafiaBotGameStatus.GAME_ANNOUNCED.toString(), 
-            mafiaBotGameRepository.findAll().get(0).getGameStatus().toString());
+            announcedGame.getGameStatus().toString());
         assertEquals("New game contains wrong game time",
             TEST_DATE_TIME, 
-            mafiaBotGameRepository.findAll().get(0).getGameTime());
+            announcedGame.getGameTime());
     }
 
     @ParameterizedTest
     @EnumSource(value = MafiaBotGameStatus.class, names = {"GAME_STARTED", "GAME_PAUSED"})
     @Description("Verify game with correct status finished when finishGame() executed")            
     public void shouldFinishGameWhenCommandInvoked(MafiaBotGameStatus correctGameStatus) throws MafiaBotGameFinishException {
-        MafiaBotGame gameToCreate = MafiaBotGame.builder()
-                                        .gameStatus(correctGameStatus)
-                                        .build();
-        mafiaBotGameRepository.save(gameToCreate);
+        MafiaBotGame game = createAndSaveMafiaBotGame(correctGameStatus);
         assertEquals("Wrong number of new games in repository",
-            mafiaBotGameRepository.findAll().size(), 1);
-        MafiaBotGame game = mafiaBotGameRepository.findAll().get(0);
+            1, mafiaBotGameRepository.count());
         
         mafiaBotService.finishGame(game.getId());
         
         assertEquals("New game contains wrong status",
             MafiaBotGameStatus.GAME_FINISHED.toString(), 
-            mafiaBotGameRepository.findAll().get(0).getGameStatus().toString());
+            game.getGameStatus().toString());
     }
 
     @ParameterizedTest
@@ -113,19 +112,15 @@ public class MafiaBotServiceIntegrationTest {
                 mode = EnumSource.Mode.EXCLUDE)
     @Description("Verify finishGame() throws exception for the game, that is not started")
     public void shouldThrowExceptionWhenFinishingGameWithWrongStatus(MafiaBotGameStatus exceptionGameStatus) {
-        MafiaBotGame gameToCreate = MafiaBotGame.builder()
-                                        .gameStatus(exceptionGameStatus)
-                                        .build();
-        mafiaBotGameRepository.save(gameToCreate);
+        MafiaBotGame game = createAndSaveMafiaBotGame(exceptionGameStatus);
         assertEquals("Wrong number of new games in repository",
-                    mafiaBotGameRepository.findAll().size(), 1);
-        MafiaBotGame game = mafiaBotGameRepository.findAll().get(0);
+                    1, mafiaBotGameRepository.count());
         
         Exception exception = assertThrows(Exception.class, () -> {
             mafiaBotService.finishGame(game.getId());
         });
         
-        assertTrue("Wrong exception message for the exception, when game with wrong status is tried to be finished: " 
+        assertTrue("Wrong exception message, when game with wrong status is tried to be finished: " 
                     + exception.getMessage(),
             exception.getMessage().equals(MafiaBotService.GAME_FINISH_FAILED_WRONG_STATUS_PLACEHOLDER + exceptionGameStatus.toString()));
     }
@@ -136,30 +131,21 @@ public class MafiaBotServiceIntegrationTest {
     @Description("Verify adding player to the game with correct status")
     public void shouldAddPlayerWhenGameInCorrectStatus(MafiaBotGameStatus correctGameStatus) 
                                     throws MafiaBotAddPlayerException {
-        MafiaBotUser userToCreate = MafiaBotUser.builder()
-                                .firstname("Test")
-                                .lastname("User")
-                                .location("Canning Town, London")
-                                .nickname("Nickname")
-                                .build();
-        mafiaBotUserRepository.save(userToCreate);
+        MafiaBotUser user = createAndSaveMafiaBotUser("@abcdef");
         assertEquals("Wrong number of new users in repository",
-                        mafiaBotUserRepository.findAll().size(), 1);
-        MafiaBotUser user = mafiaBotUserRepository.findAll().get(0);
-        MafiaBotGame gameToCreate = MafiaBotGame.builder()
-                                        .gameStatus(correctGameStatus)
-                                        .build();
-        mafiaBotGameRepository.save(gameToCreate);
+                        mafiaBotUserRepository.count(), 1);
+        MafiaBotGame game = createAndSaveMafiaBotGame(correctGameStatus);
         assertEquals("Wrong number of new games in repository",
-                        mafiaBotGameRepository.findAll().size(), 1);
-        testEntityManager.detach(gameToCreate);
-        MafiaBotGame game = mafiaBotGameRepository.findAll().get(0);
-        
-        mafiaBotService.addPlayer(game, user);
+                        mafiaBotGameRepository.count(), 1);
+        testEntityManager.detach(game);
+        //required to have 
+        game = mafiaBotGameRepository.findById(game.getId()).get();
+
+        mafiaBotService.addPlayer(game.getId(), user.getTelegramNickname());
 
         List<MafiaBotPlayer> players = mafiaBotPlayerRepository.findAll();
         assertEquals("Wrong number of new players in repository",
-                        players.size(), 1);
+                        1, players.size());
         MafiaBotPlayer player = players.get(0);
         assertEquals("Wrong game assigned to player",
                         player.getGame().getId(), game.getId());
@@ -173,27 +159,17 @@ public class MafiaBotServiceIntegrationTest {
                 mode = EnumSource.Mode.EXCLUDE)
     @Description("Verify adding player throws exception for the game with incorrect status")
     public void shouldThrowExceptionWhenAddingPlayerForGameWithWrongStatus(MafiaBotGameStatus exceptionGameStatus) {
-        MafiaBotUser userToCreate = MafiaBotUser.builder()
-                                .firstname("Test")
-                                .lastname("User")
-                                .location("Canning Town, London")
-                                .nickname("Nickname")
-                                .build();
-        mafiaBotUserRepository.save(userToCreate);
+        MafiaBotUser user = createAndSaveMafiaBotUser("@abcdef");
         assertEquals("Wrong number of new users in repository",
-                        mafiaBotUserRepository.findAll().size(), 1);
-        MafiaBotUser user = mafiaBotUserRepository.findAll().get(0);
-        MafiaBotGame gameToCreate = MafiaBotGame.builder()
-                                        .gameStatus(exceptionGameStatus)
-                                        .build();
-        mafiaBotGameRepository.save(gameToCreate);
+                        1, mafiaBotUserRepository.count());
+        MafiaBotGame gameToCreate = createAndSaveMafiaBotGame(exceptionGameStatus);
         assertEquals("Wrong number of new games in repository",
-                        mafiaBotGameRepository.findAll().size(), 1);
+                        1, mafiaBotGameRepository.count());
         testEntityManager.detach(gameToCreate);
-        MafiaBotGame game = mafiaBotGameRepository.findAll().get(0);
+        MafiaBotGame game = mafiaBotGameRepository.findById(gameToCreate.getId()).get();
         
         Exception exception = assertThrows(MafiaBotAddPlayerException.class, () -> {
-            mafiaBotService.addPlayer(game, user);
+            mafiaBotService.addPlayer(game.getId(), user.getTelegramNickname());
         });
         
         assertTrue("Wrong exception message for the exception, when game with wrong status is tried to be finished: " 
@@ -201,36 +177,66 @@ public class MafiaBotServiceIntegrationTest {
             exception.getMessage().equals(MafiaBotService.ADD_PLAYER_FAILED_WRONG_GAME_STATUS_PLACEHOLDER + exceptionGameStatus.toString()));
     }
     
-    // @Test
-    // @Description("Verify adding player throws exception for the full game")
-    // public void shouldThrowExceptionWhenAddingPlayerForFullGame(MafiaBotGameStatus exceptionGameStatus) {
-    //     MafiaBotUser userToCreate = MafiaBotUser.builder()
-    //                             .firstname("Test")
-    //                             .lastname("User")
-    //                             .location("Canning Town, London")
-    //                             .nickname("Nickname")
-    //                             .build();
-    //     mafiaBotUserRepository.save(userToCreate);
-    //     assertEquals("Wrong number of new users in repository",
-    //                     mafiaBotUserRepository.findAll().size(), 1);
-    //     MafiaBotUser user = mafiaBotUserRepository.findAll().get(0);
-    //     MafiaBotGame gameToCreate = MafiaBotGame.builder()
-    //                                     .gameStatus(exceptionGameStatus)
-    //                                     .build();
-    //     mafiaBotGameRepository.save(gameToCreate);
-    //     assertEquals("Wrong number of new games in repository",
-    //                     mafiaBotGameRepository.findAll().size(), 1);
-    //     testEntityManager.detach(gameToCreate);
-    //     MafiaBotGame game = mafiaBotGameRepository.findAll().get(0);
+    @Test
+    @Description("Verify adding player throws exception for the full game")
+    public void shouldThrowExceptionWhenAddingPlayerForFullGame() {
+        MafiaBotGame game = createAndSaveMafiaBotGame(MafiaBotGameStatus.GAME_ANNOUNCED);
+        testEntityManager.detach(game);
+        List<MafiaBotUser> usersToCreate = new ArrayList<>();
+        List<MafiaBotPlayer> playersToCreate = new ArrayList<>();
+        for (int i = 0; i < MafiaBotService.FULL_TABLE_PLAYERS_COUNT; ++i) {
+            usersToCreate.add(createMafiaBotUser("@abcdef" + i));
+        }
+        mafiaBotUserRepository.saveAllAndFlush(usersToCreate);
+        for (int i = 0; i < MafiaBotService.FULL_TABLE_PLAYERS_COUNT; ++i) {
+            MafiaBotPlayer player = createMafiaBotPlayer(game, usersToCreate.get(i));
+            playersToCreate.add(player);
+        }
+        mafiaBotPlayerRepository.saveAllAndFlush(playersToCreate);
+        assertEquals("Wrong number of new players in repository",
+                        mafiaBotPlayerRepository.count(), MafiaBotService.FULL_TABLE_PLAYERS_COUNT);
         
-    //     Exception exception = assertThrows(MafiaBotAddPlayerException.class, () -> {
-    //         mafiaBotService.addPlayer(game, user);
-    //     });
+        MafiaBotUser user = createAndSaveMafiaBotUser("@abcdef");
+
+        Exception exception = assertThrows(MafiaBotAddPlayerException.class, () -> {
+            mafiaBotService.addPlayer(game.getId(), user.getTelegramNickname());
+        });
         
-    //     assertTrue("Wrong exception message for the exception, when game with wrong status is tried to be finished: " 
-    //                 + exception.getMessage(),
-    //         exception.getMessage().equals(MafiaBotService.ADD_PLAYER_FAILED_WRONG_GAME_STATUS_PLACEHOLDER + exceptionGameStatus.toString()));
-    // }
+        assertTrue("Wrong exception message, when game with wrong status is tried to be finished: " 
+                    + exception.getMessage(),
+            exception.getMessage().equals(MafiaBotService.ADD_PLAYER_FAILED_TABLE_IS_FULL));
+    }
+
+    @Test
+    @Description("Verify adding player throws exception for the player, registered as judge")
+    public void shouldThrowExceptionWhenAddingPlayerRegisteredAsJudge() {
+        MafiaBotGame game = createAndSaveMafiaBotGame(MafiaBotGameStatus.GAME_ANNOUNCED);
+        testEntityManager.detach(game);
+        List<MafiaBotUser> usersToCreate = new ArrayList<>();
+        List<MafiaBotPlayer> playersToCreate = new ArrayList<>();
+        for (int i = 0; i < MafiaBotService.FULL_TABLE_PLAYERS_COUNT; ++i) {
+            usersToCreate.add(createMafiaBotUser("@abcdef" + i));
+        }
+        mafiaBotUserRepository.saveAllAndFlush(usersToCreate);
+        for (int i = 0; i < MafiaBotService.FULL_TABLE_PLAYERS_COUNT; ++i) {
+            MafiaBotPlayer player = createMafiaBotPlayer(game, usersToCreate.get(i));
+            playersToCreate.add(player);
+        }
+        mafiaBotPlayerRepository.saveAllAndFlush(playersToCreate);
+        assertEquals("Wrong number of new players in repository",
+                        mafiaBotPlayerRepository.count(), MafiaBotService.FULL_TABLE_PLAYERS_COUNT);
+        
+        MafiaBotUser user = createAndSaveMafiaBotUser("@abcdef");
+
+        Exception exception = assertThrows(MafiaBotAddPlayerException.class, () -> {
+            mafiaBotService.addPlayer(game.getId(), user.getTelegramNickname());
+        });
+        
+        assertTrue("Wrong exception message, when game with wrong status is tried to be finished: " 
+                    + exception.getMessage(),
+            exception.getMessage().equals(MafiaBotService.ADD_PLAYER_FAILED_TABLE_IS_FULL));
+    }
+
 
     // @Test
     // @Description("Verify adding player throws exception for the player, regaistered as judge")
@@ -262,4 +268,43 @@ public class MafiaBotServiceIntegrationTest {
     //                 + exception.getMessage(),
     //         exception.getMessage().equals(MafiaBotService.ADD_PLAYER_FAILED_WRONG_GAME_STATUS_PLACEHOLDER + exceptionGameStatus.toString()));
     // }
+
+    private MafiaBotGame createAndSaveMafiaBotGame(final MafiaBotGameStatus gameStatus) {
+        MafiaBotGame game = createMafiaBotGame(gameStatus);
+        mafiaBotGameRepository.saveAndFlush(game);
+        return game;
+    }
+
+    private MafiaBotGame createMafiaBotGame(final MafiaBotGameStatus gameStatus) {
+        MafiaBotGame game = MafiaBotGame.builder()
+                                        .gameStatus(gameStatus)
+                                        .build();
+        return game;
+    }
+
+    private MafiaBotUser createAndSaveMafiaBotUser(final String telegramNickname) {
+        MafiaBotUser user = createMafiaBotUser(telegramNickname);
+        mafiaBotUserRepository.saveAndFlush(user);
+        return user;
+    }
+
+    private MafiaBotUser createMafiaBotUser(final String telegramNickname) {
+        MafiaBotUser user = MafiaBotUser.builder()
+                                .telegramNickname(telegramNickname)
+                                .firstname("Test")
+                                .lastname("User")
+                                .location("Canning Town, London")
+                                .nickname("Nickname")
+                                .mafiaPlayers(new HashSet<>())
+                                .build();
+        return user;
+    }
+
+    private MafiaBotPlayer createMafiaBotPlayer(MafiaBotGame game, MafiaBotUser user) {
+        MafiaBotPlayer player = MafiaBotPlayer.builder()
+                                .game(game)
+                                .player(user)
+                                .build();
+        return player;
+    }
 }
